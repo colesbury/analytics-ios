@@ -16,7 +16,7 @@
 {
     
     // initialize the analytics-app project
-    [Analytics withSecret:@"k5l6rrye0hsv566zwuk7"];
+    [Analytics initializeWithSecret:@"k5l6rrye0hsv566zwuk7"];
     
     // during development: reset the settings cache frequently so that
     // as you change settings on your integrations page, the settings update quickly here.

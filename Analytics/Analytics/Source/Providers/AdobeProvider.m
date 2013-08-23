@@ -92,6 +92,7 @@
 - (void)identify:(NSString *)userId traits:(NSDictionary *)traits context:(NSDictionary *)context
 {
     // TODO: keep traits in a local store and merge them onto event/screen properties when they're sent?
+    // set eVars and props
 }
 
 - (void)track:(NSString *)event properties:(NSDictionary *)properties context:(NSDictionary *)context

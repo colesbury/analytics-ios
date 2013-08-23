@@ -2,15 +2,13 @@
 // Copyright 2013 Segment.io
 
 #import <Foundation/Foundation.h>
-#import "ProviderManager.h"
 
-#define ANALYTICS_VERSION @"0.5.4"
+#define ANALYTICS_VERSION @"0.5.3"
 
 @interface Analytics : NSObject
 
 @property(nonatomic, strong) NSString *secret;
-@property(nonatomic, strong) ProviderManager *providerManager;
-
+@property(nonatomic, readonly) NSArray *providers;
 
 
 // Step 1: Initialization
@@ -43,7 +41,7 @@
 }
 
 */
-+ (instancetype)withSecret:(NSString *)secret;
++ (void)initializeWithSecret:(NSString *)secret;
 
 
 
@@ -59,7 +57,7 @@
  Gets the shared Analytics instance.
 
  @discussion
- Once you initialize the shared Analytics instance via [Analytics withSecret:...] you can get the instance at any time like this:
+ Once you initialize the shared Analytics instance via [Analytics initializeWithSecret:...] you can get the instance at any time like this:
 
  [Analytics sharedInstance]
 
@@ -140,6 +138,21 @@
 
 
 
+/*!
+ @method
+ 
+ @abstract
+ Register the given device to receive push notifications from applicable providers.
+ 
+ @discussion
+ Some providers (such as Mixpanel) are capable of sending push notification to users based on 
+ their traits and actions. This will associate the device token with the current user in providers
+ that have this capability. You should call this method with the <code>NSData</code> token passed to
+ <code>application:didRegisterForRemoteNotificationsWithDeviceToken:</code>.
+ 
+ @param deviceToken     device token as returned <code>application:didRegisterForRemoteNotificationsWithDeviceToken:</code>
+ */
+- (void)registerPushDeviceToken:(NSData *)deviceToken;
 
 
 // Development Tools
@@ -159,7 +172,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Initialize your shared Analytics instance.
-    [Analytics withSecret:@"YOUR SEGMENT.IO SECRET KEY FROM THE SETUP GUIDE AT HTTPS://SEGMENT.IO"];
+    [Analytics initializeWithSecret:@"YOUR SEGMENT.IO SECRET KEY FROM THE SETUP GUIDE AT HTTPS://SEGMENT.IO"];
     
     // During development: reset the settings cache frequently so that
     // as you change settings on your integrations page, the settings update quickly here.
@@ -192,7 +205,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Initialize your shared Analytics instance.
-    [Analytics withSecret:@"YOUR SEGMENT.IO SECRET KEY FROM THE SETUP GUIDE AT HTTPS://SEGMENT.IO"];
+    [Analytics initializeWithSecret:@"YOUR SEGMENT.IO SECRET KEY FROM THE SETUP GUIDE AT HTTPS://SEGMENT.IO"];
     
     // During development: reset the settings cache frequently so that
     // as you change settings on your integrations page, the settings update quickly here.
@@ -210,11 +223,7 @@
 - (void)debug:(BOOL)showDebugLogs;
 
 
-
-
-
-
-// Internal
+// Advanced
 // --------
 
 /*!
@@ -225,5 +234,8 @@
 */
 - (id)initWithSecret:(NSString *)secret;
 
+// Must be called before initializing Analytics in order to successfully register provider
++ (NSDictionary *)registeredProviders;
++ (void)registerProvider:(Class)providerClass withIdentifier:(NSString *)identifer;
 
 @end
